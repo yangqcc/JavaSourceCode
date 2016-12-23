@@ -36,6 +36,7 @@
 package java.util.concurrent;
 
 /**
+ * 能够返回结果的任务，也可能抛出一个异常
  * A task that returns a result and may throw an exception.
  * Implementors define a single method with no arguments called
  * {@code call}.
