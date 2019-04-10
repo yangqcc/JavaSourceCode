@@ -234,12 +234,13 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
      */
 
     /**
-     * Ĭ�ϳ�ʼ������������2�ı���
+     * 默认数组的初始化容量，必须是2的指数
      * The default initial capacity - MUST be a power of two.
      */
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
 
     /**
+     *
      * The maximum capacity, used if a higher value is implicitly specified
      * by either of the constructors with arguments.
      * MUST be a power of two <= 1<<30.
@@ -247,17 +248,18 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
     static final int MAXIMUM_CAPACITY = 1 << 30;
 
     /**
-     * Ĭ�ϼ������ӣ������ڹ��캯����ָ��
+     * 默认加载因子
      * The load factor used when none specified in constructor.
      */
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     /**
-     * ��ֵ����8ʱ����ʹ�ú������������
+     * 容器的数量阈值，找过这个就使用tree，小于该数值就使用list
      * The bin count threshold for using a tree rather than list for a
      * bin.  Bins are converted to trees when adding an element to a
      * bin with at least this many nodes. The value must be greater
      * than 2 and should be at least 8 to mesh with assumptions in
+     *
      * tree removal about conversion back to plain bins upon
      * shrinkage.
      */
@@ -394,6 +396,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
     /* ---------------- Fields -------------- */
 
     /**
+     * table,第一次使用时初始化，必要时扩容，长度通常是2的倍数
      * The table, initialized on first use, and resized as
      * necessary. When allocated, length is always a power of two.
      * (We also tolerate length zero in some operations to allow
@@ -422,6 +425,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
     transient int modCount;
 
     /**
+     * 下一次应该扩容的数值，容量*负载因子
      * The next size value at which to resize (capacity * load factor).
      *
      * @serial
@@ -433,6 +437,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
     int threshold;
 
     /**
+     * hash表的负载因子
      * The load factor for the hash table.
      *
      * @serial
@@ -445,7 +450,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
      * Constructs an empty <tt>HashMap</tt> with the specified initial
      * capacity and load factor.
      *
-     * @param  initialCapacity the initial capacity
+     * @param  initialCapacity the initial capacity 初始化容量
      * @param  loadFactor      the load factor
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
@@ -464,6 +469,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
     }
 
     /**
+     * 指定初始化容量和默认加载因子
      * Constructs an empty <tt>HashMap</tt> with the specified initial
      * capacity and the default load factor (0.75).
      *
@@ -621,11 +627,11 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
     /**
      * Implements Map.put and related methods
      *
-     * @param hash hash for key  //key��hashֵ
-     * @param key the key        //  
-     * @param value the value to put
-     * @param onlyIfAbsent if true, don't change existing value
-     * @param evict if false, the table is in creation mode.
+     * @param hash hash for key  //key的hash值
+     * @param key the key        //  key
+     * @param value the value to put //放入的值
+     * @param onlyIfAbsent if true, don't change existing value  //如果为true，就不改变已经存在的值
+     * @param evict if false, the table is in creation mode. //如果为false，table处于creation模式
      * @return previous value, or null if none
      */
 	final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
@@ -634,14 +640,14 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements java.util.Map<K,
 		int n, i;
         if ((tab = table) == null || (n = tab.length) == 0)
             n = (tab = resize()).length;
-        if ((p = tab[i = (n - 1) & hash]) == null)  //���hash����ת����Ľڵ��λ�ã����Ϊnull����ô�½��ڵ�
+        if ((p = tab[i = (n - 1) & hash]) == null)  //
             tab[i] = newNode(hash, key, value, null);
         else {
 			Node<K, V> e;
 			K k;
 			if (p.hash == hash && ((k = p.key) == key || (key != null && key.equals(k))))
 				e = p;
-			else if (p instanceof TreeNode)  //�����һ����
+			else if (p instanceof TreeNode)  //
 				e = ((TreeNode<K, V>) p).putTreeVal(this, tab, hash, key, value);
 			else {
 				for (int binCount = 0;; ++binCount) {

@@ -39,7 +39,6 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.function.ToDoubleFunction;
-import java.util.Comparators;
 
 /**
  * A comparison function, which imposes a <i>total ordering</i> on some

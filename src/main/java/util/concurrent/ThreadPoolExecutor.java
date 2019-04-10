@@ -876,6 +876,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
 
     /**
+     * 如果该线程池停止或者将要被关闭，那么返回false
      * Checks if a new worker can be added with respect to current
      * pool state and the given bound (either core or maximum). If so,
      * the worker count is adjusted accordingly, and, if possible, a
