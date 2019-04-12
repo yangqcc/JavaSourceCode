@@ -307,13 +307,21 @@ public abstract class AbstractQueuedSynchronizer
     /**
      * Wait queue node class.
      *
+     * 等待队列上的节点类
+     *
      * <p>The wait queue is a variant of a "CLH" (Craig, Landin, and
      * Hagersten) lock queue. CLH locks are normally used for
      * spinlocks.  We instead use them for blocking synchronizers, but
      * use the same basic tactic of holding some of the control
-     * information about a thread in the predecessor of its node.  A
+     * information about a thread in the predecessor of its node.
+     * 线程的前置节点保存控制信息
+     *
+     * A
      * "status" field in each node keeps track of whether a thread
-     * should block.  A node is signalled when its predecessor
+     * should block.
+     * 每个节点的"status"字段保存了一个线程是否阻塞的信息.
+     *
+     * A node is signalled when its predecessor
      * releases.  Each node of the queue otherwise serves as a
      * specific-notification-style monitor holding a single waiting
      * thread. The status field does NOT control whether threads are
@@ -384,20 +392,34 @@ public abstract class AbstractQueuedSynchronizer
      * on the design of this class.
      */
     static final class Node {
-        /** Marker to indicate a node is waiting in shared mode */
+        /** Marker to indicate a node is waiting in shared mode
+         *  标记y一个节点在share模式下等待
+         * */
         static final Node SHARED = new Node();
-        /** Marker to indicate a node is waiting in exclusive mode */
+
+        /** Marker to indicate a node is waiting in exclusive mode
+         *
+         *  表示一个节点在独占模式下等待
+         * */
         static final Node EXCLUSIVE = null;
 
-        /** waitStatus value to indicate thread has cancelled */
+        /** waitStatus value to indicate thread has cancelled
+         *  waitStatus值表示线程被取消
+         * */
         static final int CANCELLED =  1;
-        /** waitStatus value to indicate successor's thread needs unparking */
+        /** waitStatus value to indicate successor's thread needs unparking
+         *  当前waitStatus表示后继线程需要被唤醒
+         * */
         static final int SIGNAL    = -1;
-        /** waitStatus value to indicate thread is waiting on condition */
+        /** waitStatus value to indicate thread is waiting on condition
+         *  表示线程等待在condition
+         * */
         static final int CONDITION = -2;
         /**
          * waitStatus value to indicate the next acquireShared should
          * unconditionally propagate
+         *
+         * waitStatus值表示下一个acquireShared应该无条件传递下去
          */
         static final int PROPAGATE = -3;
 
@@ -473,18 +495,30 @@ public abstract class AbstractQueuedSynchronizer
 
         /**
          * Link to next node waiting on condition, or the special
-         * value SHARED.  Because condition queues are accessed only
+         * value SHARED.
+         * 连接到下一个在condition上等待的节点，或者特定SHARED值。
+         * Because condition queues are accessed only
          * when holding in exclusive mode, we just need a simple
          * linked queue to hold nodes while they are waiting on
-         * conditions. They are then transferred to the queue to
+         * conditions.
+         * 因为condition队列只会在独占模式下，所以等待在condition上，
+         * 我们只需要简单的链表来保存节点
+         *
+         * They are then transferred to the queue to
          * re-acquire. And because conditions can only be exclusive,
          * we save a field by using special value to indicate shared
          * mode.
+         *
+         * 他们在再次请求时会被转换成queue。因为condition只会在独占模式下，我们用特殊
+         * 的只来表示共享模式。
+         *
          */
         Node nextWaiter;
 
         /**
          * Returns true if node is waiting in shared mode.
+         *
+         * 如果节点等待在shared模式下，该方法会返回true
          */
         final boolean isShared() {
             return nextWaiter == SHARED;
@@ -605,7 +639,11 @@ public abstract class AbstractQueuedSynchronizer
     /**
      * Creates and enqueues node for current thread and given mode.
      *
+     * 对于当前线程和模式创建节点并且加入队列
+     *
      * @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared
+     * mode 用于表示独占模式或者共享模式
+     *
      * @return the new node
      */
     private Node addWaiter(Node mode) {
@@ -638,6 +676,7 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Wakes up node's successor, if one exists.
+     * 如果存在后继节点，那么唤醒后继节点
      *
      * @param node the node
      */
@@ -1191,19 +1230,25 @@ public abstract class AbstractQueuedSynchronizer
     /**
      * Acquires in exclusive mode, ignoring interrupts.  Implemented
      * by invoking at least once {@link #tryAcquire},
+     *
+     * 独占模式下请求，忽略中断，该操作至少调用一次tryAcquire方法
+     *
      * returning on success.  Otherwise the thread is queued, possibly
      * repeatedly blocking and unblocking, invoking {@link
      * #tryAcquire} until success.  This method can be used
      * to implement method {@link java.util.concurrent.locks.Lock#lock}.
+     *
+     * 如果tryAcquire如果成功，那么直接返回。否则该线程直接加入队列，可能会重复阻塞或者唤醒
+     * 直到调用tryAcquire成功。该方法会用于Lock.lock的操作
      *
      * @param arg the acquire argument.  This value is conveyed to
      *        {@link #tryAcquire} but is otherwise uninterpreted and
      *        can represent anything you like.
      */
     public final void acquire(int arg) {
-        if (!tryAcquire(arg) &&
-            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        if (!tryAcquire(arg) && acquireQueued(addWaiter(Node.EXCLUSIVE), arg)) {
             selfInterrupt();
+        }
     }
 
     /**
