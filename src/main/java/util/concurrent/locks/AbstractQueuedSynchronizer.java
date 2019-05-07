@@ -652,6 +652,7 @@ public abstract class AbstractQueuedSynchronizer
         Node pred = tail;
         if (pred != null) {
             node.prev = pred;
+            //重新设置tail
             if (compareAndSetTail(pred, node)) {
                 pred.next = node;
                 return node;
@@ -829,22 +830,25 @@ public abstract class AbstractQueuedSynchronizer
     }
 
     /**
-     * Checks and updates status for a node that failed to acquire.
-     * Returns true if thread should block. This is the main signal
-     * control in all acquire loops.  Requires that pred == node.prev.
+     * Checks and updates status for a node that failed to acquire. Returns true if thread should
+     * block. This is the main signal control in all acquire loops.  Requires that pred == node.prev.
      *
      * @param pred node's predecessor holding status
      * @param node the node
-     * @return {@code true} if thread should block
+     * @return {@code true} if thread should block 线程是否应该被阻塞
      */
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+        //前继节点的状态
         int ws = pred.waitStatus;
+        //表示后继节点需要被唤醒
         if (ws == Node.SIGNAL)
             /*
              * This node has already set status asking a release
              * to signal it, so it can safely park.
-             */
+             */ {
             return true;
+        }
+        //表示被取消
         if (ws > 0) {
             /*
              * Predecessor was cancelled. Skip over predecessors and
@@ -895,6 +899,8 @@ public abstract class AbstractQueuedSynchronizer
      * Acquires in exclusive uninterruptible mode for thread already in
      * queue. Used by condition wait methods as well as acquire.
      *
+     * 已经在队列里面的线程在独占模式非中断情况下进行请求。也可以用在condition等待方法上的请求
+     *
      * @param node the node
      * @param arg the acquire argument
      * @return {@code true} if interrupted while waiting
@@ -904,16 +910,22 @@ public abstract class AbstractQueuedSynchronizer
         try {
             boolean interrupted = false;
             for (;;) {
+                //执行到这里，node已经加入到队列，这里再尝试获取一次资源
+                //获取资源的方式由子类定义
                 final Node p = node.predecessor();
+                //如果前继节点是head节点并且获取资源成功
                 if (p == head && tryAcquire(arg)) {
+                    //重新设置头结点，头结点的线程为空
                     setHead(node);
+                    //帮助gc
                     p.next = null; // help GC
                     failed = false;
                     return interrupted;
                 }
-                if (shouldParkAfterFailedAcquire(p, node) &&
-                    parkAndCheckInterrupt())
+                //parkAndCheckInterrupt阻塞唤醒线程在这个方法里面
+                if (shouldParkAfterFailedAcquire(p, node) && parkAndCheckInterrupt()) {
                     interrupted = true;
+                }
             }
         } finally {
             if (failed)

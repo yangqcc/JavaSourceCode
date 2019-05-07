@@ -905,6 +905,9 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
      * Inserts the specified element into this queue, if another thread is
      * waiting to receive it.
      *
+     * 将指定元素插入队列中，如果另一个线程正在等待接收这个元素,那么则返回true，如果没有线程接收
+     * 该元素，那么则返回false
+     *
      * @param e the element to add
      * @return {@code true} if the element was added to this queue, else
      *         {@code false}
