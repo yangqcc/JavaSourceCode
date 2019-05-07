@@ -275,6 +275,8 @@ public class FutureTask<V> implements RunnableFuture<V> {
      * with the given throwable as its cause, unless this future has
      * already been set or has been cancelled.
      *
+     * 先将NEW设置为COMPLETING，然后设置异常值，再将COMPLETING设置为EXCEPTIONAL
+     *
      * <p>This method is invoked internally by the {@link #run} method
      * upon failure of the computation.
      *
