@@ -192,16 +192,23 @@ public class ThreadLocal<T> {
      * override this method, relying solely on the {@link #initialValue}
      * method to set the values of thread-locals.
      *
+     * 设置指定的值到当前线程的副本到thread-local变量
+     *
      * @param value the value to be stored in the current thread's copy of
      *        this thread-local.
      */
     public void set(T value) {
+        //当前线程
         Thread t = Thread.currentThread();
+        //获取当前线程里面的map,当前线程保存了ThreadLocal里面的值
         ThreadLocalMap map = getMap(t);
-        if (map != null)
+        if (map != null) {
             map.set(this, value);
-        else
+        }
+        //如果没有map,那么先创建map
+        else {
             createMap(t, value);
+        }
     }
 
     /**
@@ -303,6 +310,8 @@ public class ThreadLocal<T> {
          * == null) mean that the key is no longer referenced, so the
          * entry can be expunged from table.  Such entries are referred to
          * as "stale entries" in the code that follows.
+         *
+         * 这里的Entry继承自WeakReference软引用
          */
         static class Entry extends WeakReference<ThreadLocal<?>> {
             /** The value associated with this ThreadLocal. */
@@ -327,16 +336,19 @@ public class ThreadLocal<T> {
 
         /**
          * The number of entries in the table.
+         * table中entry的数量
          */
         private int size = 0;
 
         /**
          * The next size value at which to resize.
+         * 下一次扩容时的阈值
          */
         private int threshold; // Default to 0
 
         /**
          * Set the resize threshold to maintain at worst a 2/3 load factor.
+         * 扩容因子是2/3
          */
         private void setThreshold(int len) {
             threshold = len * 2 / 3;
